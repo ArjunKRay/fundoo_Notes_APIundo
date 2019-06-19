@@ -9,7 +9,9 @@ public class FundooNotesApiApplication {
 	public static void main(String[] args) 
 	
 	{
-		SpringApplication.run(FundooNotesApiApplication.class, args);
+	   SpringApplication.run(FundooNotesApiApplication.class, args);
 	}
 
+	
+	
 }

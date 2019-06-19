@@ -1,8 +1,10 @@
 package com.bridgelabz.utility;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import com.bridgelabz.dto.LoginDto;
-import com.bridgelabz.model.User;
+
+import com.bridgelabz.user.dto.LoginDto;
+import com.bridgelabz.user.model.User;
+
 
 
 

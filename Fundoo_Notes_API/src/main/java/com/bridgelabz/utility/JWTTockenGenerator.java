@@ -10,27 +10,30 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-@Component
-public class JWTTockenGenerator implements ITockenGenerate {
+     @Component
+   public class JWTTockenGenerator implements ITockenGenerator {
 
 	String secret_Key = "yesicandoit";
+	
+	
 	
 	@Override
 	public String generateTocken(String id) throws IllegalArgumentException, UnsupportedEncodingException {
 	
-		String jwtTocken =Jwts.builder().setId(id).setSubject("fundooNotes")
-				          .setExpiration(new Date(System.currentTimeMillis() + 10000000))
-				          .signWith(SignatureAlgorithm.HS256, secret_Key)
-				          .compact();
+		      String jwtTocken =Jwts.builder().setId(id).setSubject("fundooNotes")
+				                .setExpiration(new Date(System.currentTimeMillis() + 10000000))
+				                .signWith(SignatureAlgorithm.HS256, secret_Key)
+				                .compact();
 		
-		return jwtTocken;
+		              return jwtTocken;
 	}
 	
-public String verifryTocken()
-	{
+	
+	public String verifyTocken(String jwtTocken)
+	  {
 		Jws<io.jsonwebtoken.Claims> claims = Jwts.parser()
 				                             .setSigningKey(secret_Key)
-				                             .parseClaimsJws(secret_Key);
+				                             .parseClaimsJws(jwtTocken);
 		                    String userId  =  claims.getBody().getId();
 				
 		return userId;
