@@ -45,7 +45,7 @@ public class UserController
 	}
 	
 	@PostMapping("/forgot")
-	public ResponseEntity<Response> forgotPassword(@RequestBody String emailId ,StringBuffer requestUrl ,HttpServletRequest request)
+	public ResponseEntity<Response> forgotPassword(@RequestBody String emailId ,HttpServletRequest request)
 	{
 	    StringBuffer requestUrl1= request.getRequestURL();
     	Response response =userService.forgotPassword(emailId,requestUrl);		 
