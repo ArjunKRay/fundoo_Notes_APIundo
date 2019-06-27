@@ -226,7 +226,7 @@ public class NoteServiceImpl implements NoteService {
 				if (level.isPresent()) {
 					Note noteSaved = note.get();
 					Label levelSaved = level.get();
-					List<Label> levelList = noteSaved.getLavelList();
+					List<Label> levelList = new ArraysList<>();
 					levelList.add(levelSaved);
 					noteSaved.setLavelList(levelList);
 					noteSaved.setUpdatedDate(LocalDateTime.now());
@@ -260,8 +260,7 @@ public class NoteServiceImpl implements NoteService {
 					for (int i = 0; i < listLevel.size(); i++) {
 						Label level = listLevel.get(i);
 						if (listLevel.get(i).equals(levelId)) {
-							listLevel.remove(level);
-							;
+							listLevel.remove(level); The Q qcq
 							note.setLavelList(listLevel);
 							noteRepository.save(note);
 							return new Response(200, "level is deleted", null);
