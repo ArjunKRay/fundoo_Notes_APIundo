@@ -8,10 +8,9 @@ import org.springframework.stereotype.Repository;
 import com.bridgelabz.notes.model.Note;
 
 @Repository
-public interface NoteRepository extends MongoRepository<Note,String> {
-	
-	
-	Optional<Note>findByIdAndUserId(String Id,String UserId);
-	//Optional<Note>findByUserId(String userId);
-    List<Note>findByUserId(String Id);
+public interface NoteRepository extends MongoRepository<Note, String> {
+
+	Optional<Note> findByNoteId(String Id);
+
+	List<Note> findByUserId(String Id);
 }

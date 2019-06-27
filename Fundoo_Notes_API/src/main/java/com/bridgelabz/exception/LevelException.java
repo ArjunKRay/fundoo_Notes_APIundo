@@ -1,16 +1,15 @@
 package com.bridgelabz.exception;
 
-public class UserException extends RuntimeException {
-
+public class LevelException extends RuntimeException {
+	 
+	
 	private static final long serialVersionUID = 1L;
-
+	
 	private String message;
+	
+	public LevelException() {}
 
-	public UserException() {
-	}
-
-	public UserException(String message) {
-//		super(message);
+	public LevelException(String message) {
 		this.message = message;
 	}
 
@@ -21,5 +20,12 @@ public class UserException extends RuntimeException {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+
+	@Override
+	public String toString() {
+		return "LevelException [message=" + message + "]";
+	}
+	
+	
 
 }

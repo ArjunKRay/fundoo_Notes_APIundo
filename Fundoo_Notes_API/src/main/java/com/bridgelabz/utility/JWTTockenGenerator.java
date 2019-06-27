@@ -21,7 +21,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 	public String generateTocken(String id) throws IllegalArgumentException, UnsupportedEncodingException {
 	
 		      String jwtTocken =Jwts.builder().setId(id).setSubject("fundooNotes")
-				                .setExpiration(new Date(System.currentTimeMillis() + 10000000))
+				                .setExpiration(new Date(System.currentTimeMillis() + 1000000000))
 				                .signWith(SignatureAlgorithm.HS256, secret_Key)
 				                .compact();
 		

@@ -1,28 +1,30 @@
 package com.bridgelabz.notes.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.bridgelabz.user.model.User;
+
+import com.bridgelabz.exception.LevelException;
+import com.bridgelabz.exception.NoteException;
 import com.bridgelabz.exception.UserException;
+import com.bridgelabz.level.model.Label;
+import com.bridgelabz.level.repository.ILavelRepository;
 import com.bridgelabz.notes.dto.NoteDto;
 import com.bridgelabz.notes.model.Note;
 import com.bridgelabz.notes.repository.NoteRepository;
 import com.bridgelabz.response.Response;
+import com.bridgelabz.user.model.User;
 import com.bridgelabz.user.repository.UserRepository;
 import com.bridgelabz.utility.ITockenGenerator;
 
-
-
 @Service
-
 public class NoteServiceImpl implements NoteService {
-	
+
 	@Autowired
 	ITockenGenerator tockenGenerator;
 	@Autowired
@@ -31,201 +33,251 @@ public class NoteServiceImpl implements NoteService {
 	UserRepository userRepository;
 	@Autowired
 	ModelMapper modelMapper;
+	@Autowired
+	ILavelRepository levelRepository;
 
 	@Override
-	public Response creatNote(NoteDto noteDto, String tocken) {
-		
+	public Response createNote(NoteDto noteDto, String tocken) {
+
 		String id = tockenGenerator.verifyTocken(tocken);
-		
-		if(noteDto.getTittle().isEmpty() && noteDto.getDescription().isEmpty()){
-		  throw new UserException("note is Empity");
+		Note note = modelMapper.map(noteDto, Note.class);
+		Optional<User> optionalUser = userRepository.findById(id);
+
+		if (optionalUser.isPresent()) {
+			note.setUserId(id);
+			note.setCreatedDate(LocalDateTime.now());
+			note.setUpdatedDate(LocalDateTime.now());
+			noteRepository.save(note);
+			return new Response(200, "note created successfully", null);
+		} else {
+			throw new NoteException("UserId not present");
 		}
-		
-		Note note = modelMapper.map(noteDto,Note.class);    
-		Optional<User>optionalUser= userRepository.findByUserId(id);
-	    
-		if(optionalUser.isPresent()){
-	     note.setUserId(id);
-	     note.setCreatedDate(LocalDateTime.now());
-	     note.setUpdatedDate(LocalDateTime.now());
-	     Note noteSaved = noteRepository.save(note);	
-	     return new Response(200,"note created successfully",null);
-	      }
-		else {
-			throw new UserException("note note created") ;
-		   }
-		
 	}
-		
+
 	@Override
-	public Response deleteNote(String tocken, String id) {
-		
+	public Response deleteNote(NoteDto noteDto, String tocken, String noteId) {
+		if (noteDto.getTittle().isEmpty() && noteDto.getDescription().isEmpty()) {
+			throw new NoteException("note is empty");
+		}
 		String ide = tockenGenerator.verifyTocken(tocken);
-		Optional<Note>optionalNote= noteRepository.findByIdAndUserId(ide,id);
-	    
-		if(optionalNote.isPresent()) {
-	       Note notes = optionalNote.get();
-		   notes.setTrace(true);
-		   notes.setUpdatedDate(LocalDateTime.now());
-		   noteRepository.save(notes);
-	       return new Response(200,"Note is delete",null) ; 
-		  }
-	    else {
-			throw new UserException("something wrong note is note deleted");
-	       }
+		Optional<User> optionalUser = userRepository.findById(ide);
+		if (optionalUser.isPresent()) {
+			Optional<Note> optionalNote = noteRepository.findByNoteId(noteId);
+			if (optionalNote.isPresent()) {
+				Note noteSaved = optionalNote.get();
+				noteSaved.setTrash(true);
+				noteSaved.setUpdatedDate(LocalDateTime.now());
+				noteRepository.save(noteSaved);
+				return new Response(200, "Note deleted", null);
+			} else {
+				throw new NoteException("Note Id not Present");
+			}
+		} else {
+			throw new UserException("User Id not present");
+		}
+
 	}
 
 	@Override
-	public Response updateNote(NoteDto noteDto, String tocken, String id) {
-	    String ide = tockenGenerator.verifyTocken(tocken);
-		   
-	       if(noteDto.getTittle().isEmpty()&& noteDto.getDescription().isEmpty()) {
-			throw new UserException("note is empty");
-		    }
-		    Optional<Note>note= noteRepository.findByIdAndUserId(ide, id);
-		
-		    if(note.isPresent()) {
-	 	      Note notes= note.get();
-		      notes.setTittle(noteDto.getTittle());
-		      notes.setDescription(noteDto.getDescription());
-	          notes.setUpdatedDate(LocalDateTime.now());
-		      noteRepository.save(notes);
-		      return new Response(200,"Updated note successfully",null);
-		      }
-	       else {
-		      throw new UserException("Userid note matches");
-		      }	
-	}
+	public Response updateNote(NoteDto noteDto, String tocken, String noteId) {
 
-	@Override
-	public List<NoteDto> getAllNotes(String tocken) {
-		// TODO Auto-generated method stub
-		return null;
+		String ide = tockenGenerator.verifyTocken(tocken);
+		Optional<User> isUserId = userRepository.findById(ide);
+		if (isUserId.isPresent()) {
+			Optional<Note> note = noteRepository.findByNoteId(noteId);
+			if (note.isPresent()) {
+				Note noteSaved = note.get();
+				noteSaved.setTittle(noteDto.getTittle());
+				noteSaved.setDescription(noteDto.getDescription());
+				noteSaved.setUpdatedDate(LocalDateTime.now());
+				noteRepository.save(noteSaved);
+				return new Response(200, "Updated note successfully", null);
+			} else {
+				throw new NoteException("note Id not matches");
+			}
+		} else {
+			throw new UserException("User Id not present");
+		}
 	}
 
 	@Override
 	public Response archiveAndUnArchive(String tocken, String noteId) {
-		// TODO Auto-generated method stub
-		return null;
+		String ide = tockenGenerator.verifyTocken(tocken);
+		Optional<User> isUserId = userRepository.findById(ide);
+		if (isUserId.isPresent()) {
+			Optional<Note> notes = noteRepository.findByNoteId(noteId);
+			if (notes.isPresent()) {
+				Note noteSaved = notes.get();
+				if (noteSaved.isArchive()) {
+					noteSaved.setArchive(false);
+					noteRepository.save(noteSaved);
+					return new Response(200, "Unarchived notes", null);
+				} else {
+					noteSaved.setArchive(true);
+					noteRepository.save(noteSaved);
+					return new Response(200, "Archived Notes", null);
+				}
+			} else {
+				throw new NoteException("Note Id not present");
+			}
+		} else {
+			throw new UserException("User Id not Present");
+		}
+
 	}
 
 	@Override
 	public Response pinAndUnpPin(String tocken, String noteId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Response traceAndUnTrace(String tocken, String noteId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<NoteDto> getArchiveNote(String tocken) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<NoteDto> getTraceNote(String tocken) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-/**	@Override
-	public Response archiveAndUnArchive(String tocken, String id) {
 		String ide = tockenGenerator.verifyTocken(tocken);
-	    Optional<Note> notes = noteRepository.findByIdAndUserId(ide,id);
-		   if(notes.isPresent()) {
-			Note noteSaved = notes.get();
-			noteSaved.setArchive(true);
-			noteRepository.save(noteSaved);
-			return new Response(200,"archived notes" ,null);
-		    }
-		   else {
-			   throw new UserException("Unarchive");
-		     }
-	 }
+		Optional<User> isUserId = userRepository.findById(ide);
+		if (isUserId.isPresent()) {
+			Optional<Note> notes = noteRepository.findById(noteId);
+			if (notes.isPresent()) {
+				Note noteSaved = notes.get();
+				if (noteSaved.isPin()) {
+					noteSaved.setPin(false);
+					noteRepository.save(noteSaved);
+					return new Response(200, "Notes unpined ", null);
+				} else {
+					noteSaved.setPin(true);
+					noteRepository.save(noteSaved);
+					return new Response(200, "Note  pined", null);
+				}
+			} else {
+				throw new NoteException("Note Id  not present");
+			}
+		} else {
+			throw new UserException("User Id  not present");
+		}
+	}
 
 	@Override
-	public Response pinAndUnpPin(String tocken, String id) {
-		 String ide = tockenGenerator.verifyTocken(tocken);
-		 Optional<Note>notes = noteRepository.findByIdAndUserId(ide,id);
-		      if(notes.isPresent()) { 
-		    	 Note noteSaved = notes.get();
-		    	 noteSaved.setPin(true);
-		    	 noteRepository.save(noteSaved);
-		    	 return new Response(200,"Pined notes",null);
-		       }
-		      else {
-		    	  
-		    	  throw new UserException("Unpin");  
-		      } 
-	 }
-
-	@Override
-	public Response traceAndUnTrace(String tocken, String id) {
+	public Response trashAndUnTrash(String tocken, String noteId) {
 		String ide = tockenGenerator.verifyTocken(tocken);
-		Optional<Note>notes= noteRepository.findByIdAndUserId(ide,id);
-		
-		    if(notes.isPresent()) { 
-		    	Note noteSaved = notes.get();
-			    noteSaved.setTrace(true);
-			    noteRepository.save(noteSaved);
-			    return new Response(200,"Traced Note",null);
-		    }
-		    else {
-		    	
-		    	throw new UserException("UnTraced");
-		       }
-	   }
+		Optional<User> isUserId = userRepository.findById(ide);
+		if (isUserId.isPresent()) {
+			Optional<Note> notes = noteRepository.findByNoteId(noteId);
+			if (notes.isPresent()) {
+				Note noteSaved = notes.get();
+				if (noteSaved.isTrash()) {
+					noteSaved.setTrash(false);
+					noteRepository.save(noteSaved);
+					return new Response(200, " Notes  untrash", null);
+				} else {
+					noteSaved.setTrash(true);
+					noteRepository.save(noteSaved);
+					return new Response(200, "Note Trash", null);
+				}
+			} else {
+				throw new NoteException(" Note id not present");
+			}
+		} else {
+			throw new UserException("User id not Present");
+		}
+	}
 
 	@Override
 	public List<NoteDto> getAllNotes(String tocken) {
 		String id = tockenGenerator.verifyTocken(tocken);
-		List<Note> note = (List<Note>) noteRepository.findByUserId(id);
-		List<NoteDto> listNotes = new ArrayList<>();
-		for (Note userNotes : note) {
-			NoteDto noteDto = modelMapper.map(userNotes, NoteDto.class);	
+		Optional<User> isUserId = userRepository.findById(id);
+		if (isUserId.isPresent()) {
+			List<Note> notes = noteRepository.findAll();
+			List<NoteDto> listNotes = new ArrayList<>();
+			for (Note userNotes : notes) {
+				NoteDto noteDto = modelMapper.map(userNotes, NoteDto.class);
+			}
+			return listNotes;
 		}
-		return listNotes;
+		return null;
+
 	}
-	
+
+	/**
+	 * @Override public List<NoteDto> getArchiveNote(String tocken) { String id =
+	 *           tockenGenerator.verifyTocken(tocken); List<Note> note =
+	 *           (List<Note>) noteRepository.findById(id); List<NoteDto> listNotes =
+	 *           new ArrayList<>(); for (Note userNotes : note){ NoteDto noteDto =
+	 *           modelMapper.map(userNotes, NoteDto.class); if(userNotes.isArchive()
+	 *           == true) { listNotes.add(noteDto); } } return listNotes; }
+	 * 
+	 * @Override public List<NoteDto> getTrashNote(String tocken) {
+	 * 
+	 *           String id = tockenGenerator.verifyTocken(tocken); List<Note> note =
+	 *           (List<Note>) noteRepository.findById(id); List<NoteDto> listNotes =
+	 *           new ArrayList<>(); for (Note userNotes : note) { NoteDto noteDto =
+	 *           modelMapper.map(userNotes, NoteDto.class); if(userNotes.isTrash())
+	 *           { listNotes.add(noteDto); } } return listNotes; }
+	 * 
+	 * @Override public Response deleteNoteParmament(String tocken) {
+	 * 
+	 * 
+	 * 
+	 *           }
+	 **/
 	@Override
-	public List<NoteDto> getArchiveNote(String tocken) {
+	public Response addLevelToNote(String tocken, String noteId, String levelId) {
+
 		String id = tockenGenerator.verifyTocken(tocken);
-		List<Note> note = (List<Note>) noteRepository.findByUserId(id);
-		List<NoteDto> listNotes = new ArrayList<>();
-		
-		for (Note userNotes : note){
-			NoteDto noteDto = modelMapper.map(userNotes, NoteDto.class);
-			if(userNotes.isArchive() == true) 
-			{
-				listNotes.add(noteDto);
-			}	
+		Optional<User> isUserId = userRepository.findById(id);
+		if (isUserId.isPresent()) {
+			Optional<Note> note = noteRepository.findByNoteId(noteId);
+			if (note.isPresent()) {
+				Optional<Label> level = levelRepository.findByLevelId(levelId);
+				if (level.isPresent()) {
+					Note noteSaved = note.get();
+					Label levelSaved = level.get();
+					List<Label> levelList = noteSaved.getLavelList();
+					levelList.add(levelSaved);
+					noteSaved.setLavelList(levelList);
+					noteSaved.setUpdatedDate(LocalDateTime.now());
+					return new Response(200, "level added successfully", null);
+				} else {
+					throw new LevelException("level Id not Present");
+				}
+			} else {
+				throw new NoteException("note id not Present");
+			}
+		} else {
+			throw new UserException("User id not Present");
 		}
-		return listNotes;
+
 	}
 
 	@Override
-	public List<NoteDto> getTraceNote(String tocken) {
+	public Response deleteLevelToNote(String tocken, String noteId, String levelId) {
+		String ide = tockenGenerator.verifyTocken(tocken);
+		Optional<User> isUserId = userRepository.findById(ide);
+		if (isUserId.isPresent()) {
+			Optional<Note> isNoteId = noteRepository.findByNoteId(noteId);
+			if (isNoteId.isPresent()) {
 
-		String id = tockenGenerator.verifyTocken(tocken);
-		List<Note> note = (List<Note>) noteRepository.findByUserId(id);
-		List<NoteDto> listNotes = new ArrayList<>();
-		for (Note userNotes : note) {
-			NoteDto noteDto = modelMapper.map(userNotes, NoteDto.class);
-			if(userNotes.isTrace()) {
-				listNotes.add(noteDto);
-			}	
+				Optional<Label> isLevelId = levelRepository.findByLevelId(levelId);
+				if (isLevelId.isPresent()) {
+
+					Note note = isNoteId.get();
+
+					List<Label> listLevel = note.getLavelList();
+					for (int i = 0; i < listLevel.size(); i++) {
+						Label level = listLevel.get(i);
+						if (listLevel.get(i).equals(levelId)) {
+							listLevel.remove(level);
+							;
+							note.setLavelList(listLevel);
+							noteRepository.save(note);
+							return new Response(200, "level is deleted", null);
+						}
+					}
+				} else {
+					throw new NoteException("Lavel not avialbel in this note");
+				}
+			} else {
+				throw new NoteException("Note not avialable ");
+			}
+		} else {
+			throw new NoteException("User not available");
 		}
-		return listNotes;
-   }
-   **/
-   
-   
+		return null;
+
+	}
+
 }
-
-	
-

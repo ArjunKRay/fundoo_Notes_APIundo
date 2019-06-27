@@ -7,19 +7,14 @@ import org.springframework.stereotype.Component;
 
 import com.bridgelabz.user.model.Email;
 
-
-
-
 @Component
-public class MailUtil
-{
+public class MailUtil {
 
-	@Autowired(required = true)
+	@Autowired
 	private JavaMailSender javaMailSender;
 
-	
 	public void send(Email email)
-	
+
 	{
 		SimpleMailMessage simple = new SimpleMailMessage();
 
