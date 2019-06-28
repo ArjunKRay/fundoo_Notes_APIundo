@@ -39,8 +39,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Response registration(UserDto userDto, StringBuffer requestUrl) {
-		System.out.println("UserServiceImpl.registration()");
-
 //		Optional<User> optinalUser = userRepository.findByEmailId(userDto.getEmailId());
 		boolean isemail = userRepository.findByEmailId(userDto.getEmailId()).isPresent();
 		if (!isemail) {
@@ -49,7 +47,6 @@ public class UserServiceImpl implements UserService {
 			User saveUser = userRepository.save(user);
 			try {
 				String tocken = tockenGenerator.generateTocken(saveUser.getUserId());
-				System.out.println("UserServiceImpl.registration() userId " + tocken);
 				String activationUrl = requestUrl.substring(0, requestUrl.lastIndexOf("/")) + "/verification/" + tocken;
 				Email email = new Email();
 				email.setTo("kumar.arjun6515@gmail.com");
@@ -74,7 +71,6 @@ public class UserServiceImpl implements UserService {
 			 if (userSaved.isVerify() == true) {
 				boolean present = encoder.matches(loginDto.getPassword(), userSaved.getPassword());
 				 if (present == true) {
-
 					try {
 						String token = tockenGenerator.generateTocken(isEmail.get().getUserId());
 						System.out.println(token);

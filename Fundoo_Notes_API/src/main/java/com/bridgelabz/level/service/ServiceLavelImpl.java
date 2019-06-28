@@ -93,7 +93,7 @@ public class ServiceLavelImpl implements IlavelService {
 			List<Label> lavel = lavelRepository.findAll();
 			List<LavelDto> lavels = new ArrayList<>();
 			for (Label lavelList : lavel) {
-				LavelDto levelDto = modelMapper.map(lavelList, LavelDto.class);
+				LavelDto lavelDto = modelMapper.map(lavelList, LavelDto.class);
 			}
 			return lavels;
 		}

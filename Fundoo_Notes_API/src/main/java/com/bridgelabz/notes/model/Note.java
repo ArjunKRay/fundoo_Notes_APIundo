@@ -29,11 +29,9 @@ public class Note {
 	@DBRef
 	private List<User> userList;
 	@DBRef
-	private List<Label> levelList;
 	private List<Label> lavelList;
-
-	public Note() {
-	}
+	
+	public Note() {}
 
 	public Note(String userId, String tittle, String description, LocalDateTime createdDate,
 			LocalDateTime updatedDate, boolean isPin, boolean isTrash, boolean isArchive) {
@@ -53,7 +51,7 @@ public class Note {
 	}
 
 	public void setLavelList(List<Label> lavelList) {
-		this.lavelList = levelList;
+		this.lavelList = lavelList;
 	}
 
 	public String getNoteId() {

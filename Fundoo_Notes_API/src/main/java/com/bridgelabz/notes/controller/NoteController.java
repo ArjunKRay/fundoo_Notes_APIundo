@@ -55,19 +55,27 @@ public class NoteController {
 	  
   }
    @PostMapping("/addlevel")
-   public ResponseEntity<Response> addLevelToNote(@RequestHeader String tocken,@RequestParam String noteId,@RequestParam String levelId)
+   public ResponseEntity<Response> addLevelToNote(@RequestHeader String tocken,@RequestParam String noteId,@RequestParam String lavelId)
    {
-	 Response response = noteService.addLevelToNote(tocken, noteId, levelId); 
+	 Response response = noteService.addLavelToNote(tocken, noteId, lavelId); 
 	 return  new ResponseEntity<Response>(response,HttpStatus.OK);
 	   
    }
    
    public ResponseEntity<Response>deleteLevelToNote(@RequestHeader String tocken,@RequestParam String noteId,@RequestParam String levelId)
    {
-	   Response response = noteService.deleteLevelToNote(tocken, noteId, levelId);
+	   Response response = noteService.deleteLavelToNote(tocken, noteId, levelId);
 	   return  new ResponseEntity<Response>(response,HttpStatus.OK);  
    }
-/**   @GetMapping("/archive")
+/**   @GetMapping("/restore")
+ 
+    public ResponseEntity<Response>deleteLevelToNote(@RequestHeader String tocken,@RequestParam String noteId,@RequestParam String levelId)
+   {
+	   Response response = noteService.reStoreNote(tocken, noteId,);
+	   return  new ResponseEntity<Response>(response,HttpStatus.OK);  
+   }
+   
+    @GetMapping("/archive")
 	public List<NoteDto>  getArchiveNotes(@RequestHeader String tocken) {
 		List<NoteDto> listnotes = noteService.getArchiveNote(tocken);
 		return listnotes;

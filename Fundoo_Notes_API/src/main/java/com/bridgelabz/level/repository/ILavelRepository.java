@@ -11,5 +11,5 @@ public interface ILavelRepository extends MongoRepository<Label, String> {
 
 	List<Label> findByUserId(String id);
 
-	Optional<Label> findByLevelId(String id);
+	Optional<Label> findByLavelId(String id);
 }

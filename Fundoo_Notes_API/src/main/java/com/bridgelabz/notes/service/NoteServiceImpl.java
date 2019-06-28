@@ -40,10 +40,9 @@ public class NoteServiceImpl implements NoteService {
 	public Response createNote(NoteDto noteDto, String tocken) {
 
 		String id = tockenGenerator.verifyTocken(tocken);
-		Note note = modelMapper.map(noteDto, Note.class);
 		Optional<User> optionalUser = userRepository.findById(id);
-
 		if (optionalUser.isPresent()) {
+			Note note = modelMapper.map(noteDto, Note.class);
 			note.setUserId(id);
 			note.setCreatedDate(LocalDateTime.now());
 			note.setUpdatedDate(LocalDateTime.now());
@@ -80,7 +79,6 @@ public class NoteServiceImpl implements NoteService {
 
 	@Override
 	public Response updateNote(NoteDto noteDto, String tocken, String noteId) {
-
 		String ide = tockenGenerator.verifyTocken(tocken);
 		Optional<User> isUserId = userRepository.findById(ide);
 		if (isUserId.isPresent()) {
@@ -192,7 +190,22 @@ public class NoteServiceImpl implements NoteService {
 
 	}
 
-	/**
+	/** @Override
+	 * public Response reStoreNote(String tocken, String noteId){
+	 * 
+	 * String ide = tockenGenerator.verifyTocken(tocken);
+		Optional<User> isUserId = userRepository.findById(ide);
+		if (isUserId.isPresent()) {
+			Optional<Note> notes = noteRepository.findById(noteId);
+			if (notes.isPresent()) {
+				Note noteSaved = notes.get();
+				if (noteSaved.istrace=true)) {
+
+				noteSaved.add()
+				
+				}
+	 * 
+	 * 
 	 * @Override public List<NoteDto> getArchiveNote(String tocken) { String id =
 	 *           tockenGenerator.verifyTocken(tocken); List<Note> note =
 	 *           (List<Note>) noteRepository.findById(id); List<NoteDto> listNotes =
@@ -215,24 +228,24 @@ public class NoteServiceImpl implements NoteService {
 	 *           }
 	 **/
 	@Override
-	public Response addLevelToNote(String tocken, String noteId, String levelId) {
+	public Response addLavelToNote(String tocken, String noteId, String lavelId) {
 
 		String id = tockenGenerator.verifyTocken(tocken);
 		Optional<User> isUserId = userRepository.findById(id);
 		if (isUserId.isPresent()) {
 			Optional<Note> note = noteRepository.findByNoteId(noteId);
 			if (note.isPresent()) {
-				Optional<Label> level = levelRepository.findByLevelId(levelId);
+				Optional<Label> level = levelRepository.findByLavelId(lavelId);
 				if (level.isPresent()) {
 					Note noteSaved = note.get();
-					Label levelSaved = level.get();
-					List<Label> levelList = new ArraysList<>();
-					levelList.add(levelSaved);
+					Label lavelSaved = level.get();
+					List<Label> levelList = noteSaved.getLavelList();
+					levelList.add(lavelSaved);
 					noteSaved.setLavelList(levelList);
 					noteSaved.setUpdatedDate(LocalDateTime.now());
-					return new Response(200, "level added successfully", null);
+					return new Response(200, "lavel added successfully", null);
 				} else {
-					throw new LevelException("level Id not Present");
+					throw new LevelException("lavel Id not Present");
 				}
 			} else {
 				throw new NoteException("note id not Present");
@@ -244,14 +257,14 @@ public class NoteServiceImpl implements NoteService {
 	}
 
 	@Override
-	public Response deleteLevelToNote(String tocken, String noteId, String levelId) {
+	public Response deleteLavelToNote(String tocken, String noteId, String lavelId) {
 		String ide = tockenGenerator.verifyTocken(tocken);
 		Optional<User> isUserId = userRepository.findById(ide);
 		if (isUserId.isPresent()) {
 			Optional<Note> isNoteId = noteRepository.findByNoteId(noteId);
 			if (isNoteId.isPresent()) {
 
-				Optional<Label> isLevelId = levelRepository.findByLevelId(levelId);
+				Optional<Label> isLevelId = levelRepository.findByLavelId(lavelId);
 				if (isLevelId.isPresent()) {
 
 					Note note = isNoteId.get();
@@ -259,8 +272,9 @@ public class NoteServiceImpl implements NoteService {
 					List<Label> listLevel = note.getLavelList();
 					for (int i = 0; i < listLevel.size(); i++) {
 						Label level = listLevel.get(i);
-						if (listLevel.get(i).equals(levelId)) {
-							listLevel.remove(level); 
+						if (listLevel.get(i).equals(lavelId)) {
+							listLevel.remove(level);
+							;
 							note.setLavelList(listLevel);
 							noteRepository.save(note);
 							return new Response(200, "level is deleted", null);

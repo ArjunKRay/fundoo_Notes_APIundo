@@ -21,10 +21,11 @@ public interface NoteService {
 
 	Response trashAndUnTrash(String tocken, String noteId);
 
-	Response addLevelToNote(String tocken, String noteId, String levelId);
+	Response addLavelToNote(String tocken, String noteId, String lavelId);
 
-	Response deleteLevelToNote(String tocken, String noteId, String levelId);
+	Response deleteLavelToNote(String tocken, String noteId, String lavelId);
 	/*
+	 * Response reStoreNote(String tocken, String noteId);
 	 * Response setReminder(String tocken,String noteId); Response
 	 * removeReminder(String tocken,String noteId); Response
 	 * deleteNoteParmament(String tocken); List<NoteDto> getTrashNote(String
