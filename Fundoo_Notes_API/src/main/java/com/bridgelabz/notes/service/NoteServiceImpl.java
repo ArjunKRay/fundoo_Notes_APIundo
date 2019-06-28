@@ -199,7 +199,7 @@ public class NoteServiceImpl implements NoteService {
 			Optional<Note> notes = noteRepository.findById(noteId);
 			if (notes.isPresent()) {
 				Note noteSaved = notes.get();
-				if (noteSaved.istrace=true)) {
+				if (noteSaved.istrash=true)) {
 
 				noteSaved.add()
 				
