@@ -260,7 +260,7 @@ public class NoteServiceImpl implements NoteService {
 					for (int i = 0; i < listLevel.size(); i++) {
 						Label level = listLevel.get(i);
 						if (listLevel.get(i).equals(levelId)) {
-							listLevel.remove(level); The Q qcq
+							listLevel.remove(level); 
 							note.setLavelList(listLevel);
 							noteRepository.save(note);
 							return new Response(200, "level is deleted", null);
