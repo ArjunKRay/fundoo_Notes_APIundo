@@ -243,7 +243,7 @@ public class NoteServiceImpl implements NoteService {
 				if (level.isPresent()) {
 					Note noteSaved = note.get();
 					Label lavelSaved = level.get();
-					List<Label> levelList = noteSaved.getLavelList();
+					List<Label> levelList = new ArrayList<>();
 					levelList.add(lavelSaved);
 					noteSaved.setLavelList(levelList);
 					noteSaved.setUpdatedDate(LocalDateTime.now());
