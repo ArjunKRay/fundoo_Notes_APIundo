@@ -201,9 +201,13 @@ public class NoteServiceImpl implements NoteService {
 				Note noteSaved = notes.get();
 				if (noteSaved.istrash=true)) {
 
-				noteSaved.add()
-				
+				 noteSaved.setIsTrash(false);
+                                 noteSaved.setUpdatedDate(LocalDateTime.now());
+                                 noteRepository.save(noteSaved);
+
+				return new Response(200, "restore successfully", null);
 				}
+                               else{throw new NoteException("note id not Present");}}}
 	 * 
 	 * 
 	 * @Override public List<NoteDto> getArchiveNote(String tocken) { String id =
