@@ -1,5 +1,8 @@
 package com.bridgelabz.configuration;
 
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,32 +18,32 @@ import com.bridgelabz.utility.MailUtil;
 @ComponentScan("com.bridgelabz")
 public class ApplicationConfiguration {
 	
+	
+	
+	@Bean(destroyMethod = "close")
+	public RestHighLevelClient client() {
+		RestHighLevelClient client = new RestHighLevelClient(
+				RestClient.builder(new HttpHost("localhost", 9200, "http")));
+		return client;
+
+	}
+	
 	@Bean
-	public ModelMapper getModelMapper()
-	{
+	public ModelMapper getModelMapper(){
 		return new ModelMapper();		
 	}
 	@Bean
-	public PasswordEncoder getPasswordEncoder() 
-	{
+	public PasswordEncoder getPasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 	
-    public MailUtil getmailSender()
-    {
- 	
-      return new MailUtil();
-    }
-    
     @Bean
-    public Response getRespomse() 
-    {
+    public Response getRespomse() {
     	return new Response();
     }
 @Bean 
-public EncryptUtil getEncryptUtil()
-{
+public EncryptUtil getEncryptUtil(){
 	return new EncryptUtil();
-}
+   }
 
 }

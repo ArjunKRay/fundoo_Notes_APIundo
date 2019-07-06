@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.notes.dto.NoteDto;
+import com.bridgelabz.notes.model.Note;
 import com.bridgelabz.notes.service.NoteService;
 import com.bridgelabz.response.Response;
 
@@ -32,6 +33,7 @@ public class NoteController {
 	{
 	    Response response = noteService.createNote(noteDto,tocken);
 		return new ResponseEntity<Response>(response,HttpStatus.OK);
+		
 	}
 	
   @DeleteMapping("/delete")
@@ -47,9 +49,9 @@ public class NoteController {
 	  return new ResponseEntity <Response>(response,HttpStatus.OK);
   }
    @GetMapping("/getAll")
-  public List<NoteDto>getAllNote(@RequestHeader String tocken)
+  public List<Note>getAllNote(@RequestHeader String tocken)
   {
-	List<NoteDto>notesList = noteService.getAllNotes(tocken);
+	List<Note>notesList = noteService.getAllNotes(tocken);
 	
 	return notesList;
 	  
@@ -62,31 +64,32 @@ public class NoteController {
 	   
    }
    
-   public ResponseEntity<Response>deleteLevelToNote(@RequestHeader String tocken,@RequestParam String noteId,@RequestParam String levelId)
+   public ResponseEntity<Response>deleteLevelToNote1(@RequestHeader String tocken,@RequestParam String noteId,@RequestParam String levelId)
    {
 	   Response response = noteService.deleteLavelToNote(tocken, noteId, levelId);
 	   return  new ResponseEntity<Response>(response,HttpStatus.OK);  
    }
-/**   @GetMapping("/restore")
- 
+   
+  @GetMapping("/restore")
     public ResponseEntity<Response>deleteLevelToNote(@RequestHeader String tocken,@RequestParam String noteId,@RequestParam String levelId)
    {
-	   Response response = noteService.reStoreNote(tocken, noteId,);
+	   Response response = noteService.reStoreNote(tocken, noteId);
 	   return  new ResponseEntity<Response>(response,HttpStatus.OK);  
    }
    
     @GetMapping("/archive")
-	public List<NoteDto>  getArchiveNotes(@RequestHeader String tocken) {
-		List<NoteDto> listnotes = noteService.getArchiveNote(tocken);
+	public List<Note>  getArchiveNotes(@RequestHeader String tocken) {
+		List<Note> listnotes = noteService.getArchiveNote(tocken);
 		return listnotes;
 	}
 	
 	@GetMapping("/trash")
-	public List<NoteDto>  getTrashNotes(@RequestHeader String tocken) {
-		List<NoteDto> listnotes = noteService.getTrashNote(tocken);
+	public List<Note>  getTrashNotes(@RequestHeader String tocken) {
+		List<Note> listnotes = noteService.getTrashNote(tocken);
 		return listnotes;
 	}
    
-   **/
+
+  
    
 }

@@ -1,8 +1,13 @@
 package com.bridgelabz.user.model;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.bridgelabz.notes.model.Note;
 
 @Document(collection = "User")
 public class User {
@@ -16,9 +21,11 @@ public class User {
 	private String password;
 	private String mobileNo;
 	private boolean isVerify;
-
-	public User() {
-	}
+	
+	@DBRef
+	List<Note> userNote ;
+	
+	public User() {}
 
 	public User(String emailId, String name, String password, String mobileNo, boolean isVerify) {
 
@@ -28,7 +35,15 @@ public class User {
 		this.mobileNo = mobileNo;
 		this.isVerify = isVerify;
 	}
+	
+	
+	public List<Note> getUserNote() {
+		return userNote;
+	}
 
+	public void setUserNote(List<Note> userNote) {
+		this.userNote = userNote;
+	}
 	public String getUserId() {
 		return userId;
 	}

@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bridgelabz.elasticsearch.ElasticSearchService;
 import com.bridgelabz.exception.LevelException;
 import com.bridgelabz.exception.NoteException;
 import com.bridgelabz.exception.UserException;
@@ -35,6 +36,9 @@ public class NoteServiceImpl implements NoteService {
 	ModelMapper modelMapper;
 	@Autowired
 	ILavelRepository levelRepository;
+	@Autowired
+	ElasticSearchService elasticSearch;
+	
 
 	@Override
 	public Response createNote(NoteDto noteDto, String tocken) {
@@ -47,6 +51,7 @@ public class NoteServiceImpl implements NoteService {
 			note.setCreatedDate(LocalDateTime.now());
 			note.setUpdatedDate(LocalDateTime.now());
 			noteRepository.save(note);
+			elasticSearch.createNote(note);
 			return new Response(200, "note created successfully", null);
 		} else {
 			throw new NoteException("UserId not present");
@@ -63,10 +68,8 @@ public class NoteServiceImpl implements NoteService {
 		if (optionalUser.isPresent()) {
 			Optional<Note> optionalNote = noteRepository.findByNoteId(noteId);
 			if (optionalNote.isPresent()) {
-				Note noteSaved = optionalNote.get();
-				noteSaved.setTrash(true);
-				noteSaved.setUpdatedDate(LocalDateTime.now());
-				noteRepository.save(noteSaved);
+				noteRepository.delete(optionalNote.get());
+				elasticSearch.deleteNote(noteId);
 				return new Response(200, "Note deleted", null);
 			} else {
 				throw new NoteException("Note Id not Present");
@@ -88,7 +91,8 @@ public class NoteServiceImpl implements NoteService {
 				noteSaved.setTittle(noteDto.getTittle());
 				noteSaved.setDescription(noteDto.getDescription());
 				noteSaved.setUpdatedDate(LocalDateTime.now());
-				noteRepository.save(noteSaved);
+				Note updadedNote=noteRepository.save(noteSaved);
+				elasticSearch.updateNote(updadedNote);
 				return new Response(200, "Updated note successfully", null);
 			} else {
 				throw new NoteException("note Id not matches");
@@ -135,6 +139,7 @@ public class NoteServiceImpl implements NoteService {
 				if (noteSaved.isPin()) {
 					noteSaved.setPin(false);
 					noteRepository.save(noteSaved);
+					
 					return new Response(200, "Notes unpined ", null);
 				} else {
 					noteSaved.setPin(true);
@@ -175,62 +180,70 @@ public class NoteServiceImpl implements NoteService {
 	}
 
 	@Override
-	public List<NoteDto> getAllNotes(String tocken) {
+	public List<Note> getAllNotes(String tocken) {
 		String id = tockenGenerator.verifyTocken(tocken);
-		Optional<User> isUserId = userRepository.findById(id);
-		if (isUserId.isPresent()) {
-			List<Note> notes = noteRepository.findAll();
-			List<NoteDto> listNotes = new ArrayList<>();
-			for (Note userNotes : notes) {
-				NoteDto noteDto = modelMapper.map(userNotes, NoteDto.class);
-			}
-			return listNotes;
+		Optional<User> optionalUser= userRepository.findById(id);
+		List<Note> notes=new ArrayList<Note>();
+		if(optionalUser.isPresent()) {
+			User user=optionalUser.get();
+			notes=user.getUserNote();
 		}
-		return null;
-
+		return notes;
 	}
 
-	/** @Override
-	 * public Response reStoreNote(String tocken, String noteId){
-	 * 
-	 * String ide = tockenGenerator.verifyTocken(tocken);
+	@Override
+	public Response reStoreNote(String tocken, String noteId) {
+		String ide = tockenGenerator.verifyTocken(tocken);
 		Optional<User> isUserId = userRepository.findById(ide);
 		if (isUserId.isPresent()) {
 			Optional<Note> notes = noteRepository.findById(noteId);
 			if (notes.isPresent()) {
 				Note noteSaved = notes.get();
-				if (noteSaved.istrash=true)) {
-
-				 noteSaved.setIsTrash(false);
-                                 noteSaved.setUpdatedDate(LocalDateTime.now());
-                                 noteRepository.save(noteSaved);
-
-				return new Response(200, "restore successfully", null);
+				if (noteSaved.isTrash() == true) {
+					noteSaved.setTrash(false);
+					noteRepository.save(noteSaved);
+					return new Response(200, "note restore successfully", null);
+				} else {
+					throw new NoteException("");
 				}
-                               else{throw new NoteException("note id not Present");}}}
-	 * 
-	 * 
-	 * @Override public List<NoteDto> getArchiveNote(String tocken) { String id =
-	 *           tockenGenerator.verifyTocken(tocken); List<Note> note =
-	 *           (List<Note>) noteRepository.findById(id); List<NoteDto> listNotes =
-	 *           new ArrayList<>(); for (Note userNotes : note){ NoteDto noteDto =
-	 *           modelMapper.map(userNotes, NoteDto.class); if(userNotes.isArchive()
-	 *           == true) { listNotes.add(noteDto); } } return listNotes; }
-	 * 
-	 * @Override public List<NoteDto> getTrashNote(String tocken) {
-	 * 
-	 *           String id = tockenGenerator.verifyTocken(tocken); List<Note> note =
-	 *           (List<Note>) noteRepository.findById(id); List<NoteDto> listNotes =
-	 *           new ArrayList<>(); for (Note userNotes : note) { NoteDto noteDto =
-	 *           modelMapper.map(userNotes, NoteDto.class); if(userNotes.isTrash())
-	 *           { listNotes.add(noteDto); } } return listNotes; }
-	 * 
-	 * @Override public Response deleteNoteParmament(String tocken) {
-	 * 
-	 * 
-	 * 
-	 *           }
-	 **/
+			} else {
+				throw new NoteException("");
+			}
+		} else {
+			throw new UserException("");
+		}
+	}
+
+	
+
+	@Override
+	public List<Note> getArchiveNote(String token) {
+		String id = tockenGenerator.verifyTocken(token);
+		Optional<User> optionUser = userRepository.findById(id);
+		return optionUser.filter(user -> {
+			return user != null;
+		}).map(user -> {
+			List<Note> listNotes = noteRepository.findByUserIdAndArchive(id, true);
+			return listNotes;
+		}).orElseThrow(() -> new NoteException("note id note found"));
+	}
+
+	@Override
+	public List<Note> getTrashNote(String tocken) {
+
+		String id = tockenGenerator.verifyTocken(tocken);
+		Optional<User> optionUser = userRepository.findById(id);
+		return optionUser.filter(user -> {
+			return user != null;
+		}).map(user -> {
+			List<Note> listNotes = noteRepository.findByUserIdAndTrash(id, true);
+			return listNotes;
+		}).orElseThrow(() -> new NoteException("note id note found"));
+	}
+
+
+
+
 	@Override
 	public Response addLavelToNote(String tocken, String noteId, String lavelId) {
 
@@ -243,7 +256,7 @@ public class NoteServiceImpl implements NoteService {
 				if (level.isPresent()) {
 					Note noteSaved = note.get();
 					Label lavelSaved = level.get();
-					List<Label> levelList = new ArrayList<>();
+					List<Label> levelList = noteSaved.getLavelList();
 					levelList.add(lavelSaved);
 					noteSaved.setLavelList(levelList);
 					noteSaved.setUpdatedDate(LocalDateTime.now());
@@ -276,9 +289,8 @@ public class NoteServiceImpl implements NoteService {
 					List<Label> listLevel = note.getLavelList();
 					for (int i = 0; i < listLevel.size(); i++) {
 						Label level = listLevel.get(i);
-						if (listLevel.get(i).equals(lavelId)) {
+						if (level.equals(lavelId)) {
 							listLevel.remove(level);
-							;
 							note.setLavelList(listLevel);
 							noteRepository.save(note);
 							return new Response(200, "level is deleted", null);
@@ -295,6 +307,18 @@ public class NoteServiceImpl implements NoteService {
 		}
 		return null;
 
+	}
+
+	@Override
+	public Response setReminder(String tocken, String noteId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response removeReminder(String tocken, String noteId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
