@@ -19,15 +19,11 @@ public class Note {
 	private String tittle;
 	private String description;
 //	private String images;
-//	private String reminder;
 	private LocalDateTime createdDate;
 	private LocalDateTime updatedDate;
 	private boolean isPin;
 	private boolean isTrash;
 	private boolean isArchive;
-
-	@DBRef
-	private List<User> userList;
 	@DBRef
 	private List<Label> lavelList;
 	
@@ -142,13 +138,7 @@ public class Note {
 //		this.reminder = reminder;
 //	}
 
-	public List<User> getUserList() {
-		return userList;
-	}
-
-	public void setUserList(List<User> userList) {
-		this.userList = userList;
-	}
+	
 
 	@Override
 	public String toString() {

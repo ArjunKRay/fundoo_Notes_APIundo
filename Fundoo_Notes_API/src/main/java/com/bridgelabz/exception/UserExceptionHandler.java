@@ -28,8 +28,8 @@ public class UserExceptionHandler
 		 return new ResponseEntity<Response>(response,HttpStatus.BAD_REQUEST);
 	 }
 	 
-    @ExceptionHandler(LevelException.class)
-     public ResponseEntity<Response>handleLevelException(RuntimeException runtimeException){
+    @ExceptionHandler(LabelException.class)
+     public ResponseEntity<Response>handleLabelException(RuntimeException runtimeException){
        Response response = new Response(HttpStatus.BAD_REQUEST.value(),runtimeException.getMessage(),null);
        return new ResponseEntity<Response>(response,HttpStatus.BAD_REQUEST);
     }

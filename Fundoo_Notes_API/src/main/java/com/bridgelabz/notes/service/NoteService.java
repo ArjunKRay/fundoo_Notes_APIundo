@@ -28,10 +28,6 @@ public interface NoteService {
 
 	Response reStoreNote(String tocken, String noteId);
 
-	Response setReminder(String tocken, String noteId);
-
-	Response removeReminder(String tocken, String noteId);
-
 	List<Note> getArchiveNote(String tocken);
 
 	List<Note> getTrashNote(String tocken);

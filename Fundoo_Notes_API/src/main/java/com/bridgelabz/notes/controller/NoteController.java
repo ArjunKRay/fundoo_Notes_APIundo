@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bridgelabz.elasticsearch.ElasticSearchService;
 import com.bridgelabz.notes.dto.NoteDto;
 import com.bridgelabz.notes.model.Note;
 import com.bridgelabz.notes.service.NoteService;
@@ -26,8 +27,10 @@ public class NoteController {
 
 	@Autowired
 	NoteService noteService;
-	 
 	
+	@Autowired
+	ElasticSearchService elasticSearch;
+	 
 	@PostMapping("/creat")
 	public ResponseEntity<Response>creatNote(@RequestBody NoteDto noteDto,@RequestHeader String tocken)
 	{
@@ -64,14 +67,8 @@ public class NoteController {
 	   
    }
    
-   public ResponseEntity<Response>deleteLevelToNote1(@RequestHeader String tocken,@RequestParam String noteId,@RequestParam String levelId)
-   {
-	   Response response = noteService.deleteLavelToNote(tocken, noteId, levelId);
-	   return  new ResponseEntity<Response>(response,HttpStatus.OK);  
-   }
-   
   @GetMapping("/restore")
-    public ResponseEntity<Response>deleteLevelToNote(@RequestHeader String tocken,@RequestParam String noteId,@RequestParam String levelId)
+    public ResponseEntity<Response>reStoreNote(@RequestHeader String tocken,@RequestParam String noteId)
    {
 	   Response response = noteService.reStoreNote(tocken, noteId);
 	   return  new ResponseEntity<Response>(response,HttpStatus.OK);  
@@ -85,11 +82,22 @@ public class NoteController {
 	
 	@GetMapping("/trash")
 	public List<Note>  getTrashNotes(@RequestHeader String tocken) {
-		List<Note> listnotes = noteService.getTrashNote(tocken);
-		return listnotes;
+		List<Note> listNotes = noteService.getTrashNote(tocken);
+		return listNotes;
 	}
-   
-
-  
+   @GetMapping("/searchbytitle")
+	public List<Note> elasticSearchByTitle(@RequestParam String getString,@RequestHeader String tocken){
+	   
+	  List<Note>listNote= elasticSearch.elasticSearchByTitle(getString, tocken);
+	   return listNote;
+	   
+   }
+  @GetMapping("/findnoteid")
+  public Note findByNoteId(@RequestParam String noteId) {
+	  
+	  Note notes= elasticSearch.findByNoteId(noteId);
+	  return notes;
+	  
+  }
    
 }

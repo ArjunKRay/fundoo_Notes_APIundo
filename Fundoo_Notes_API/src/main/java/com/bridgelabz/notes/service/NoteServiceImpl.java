@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.elasticsearch.ElasticSearchService;
-import com.bridgelabz.exception.LevelException;
+import com.bridgelabz.exception.LabelException;
 import com.bridgelabz.exception.NoteException;
 import com.bridgelabz.exception.UserException;
 import com.bridgelabz.level.model.Label;
-import com.bridgelabz.level.repository.ILavelRepository;
+import com.bridgelabz.level.repository.ILabelRepository;
 import com.bridgelabz.notes.dto.NoteDto;
 import com.bridgelabz.notes.model.Note;
 import com.bridgelabz.notes.repository.NoteRepository;
@@ -35,10 +35,9 @@ public class NoteServiceImpl implements NoteService {
 	@Autowired
 	ModelMapper modelMapper;
 	@Autowired
-	ILavelRepository levelRepository;
+	ILabelRepository labelRepository;
 	@Autowired
 	ElasticSearchService elasticSearch;
-	
 
 	@Override
 	public Response createNote(NoteDto noteDto, String tocken) {
@@ -91,7 +90,7 @@ public class NoteServiceImpl implements NoteService {
 				noteSaved.setTittle(noteDto.getTittle());
 				noteSaved.setDescription(noteDto.getDescription());
 				noteSaved.setUpdatedDate(LocalDateTime.now());
-				Note updadedNote=noteRepository.save(noteSaved);
+				Note updadedNote = noteRepository.save(noteSaved);
 				elasticSearch.updateNote(updadedNote);
 				return new Response(200, "Updated note successfully", null);
 			} else {
@@ -139,7 +138,7 @@ public class NoteServiceImpl implements NoteService {
 				if (noteSaved.isPin()) {
 					noteSaved.setPin(false);
 					noteRepository.save(noteSaved);
-					
+
 					return new Response(200, "Notes unpined ", null);
 				} else {
 					noteSaved.setPin(true);
@@ -182,11 +181,11 @@ public class NoteServiceImpl implements NoteService {
 	@Override
 	public List<Note> getAllNotes(String tocken) {
 		String id = tockenGenerator.verifyTocken(tocken);
-		Optional<User> optionalUser= userRepository.findById(id);
-		List<Note> notes=new ArrayList<Note>();
-		if(optionalUser.isPresent()) {
-			User user=optionalUser.get();
-			notes=user.getUserNote();
+		Optional<User> optionalUser = userRepository.findById(id);
+		List<Note> notes = new ArrayList<Note>();
+		if (optionalUser.isPresent()) {
+			User user = optionalUser.get();
+			notes = user.getUserNote();
 		}
 		return notes;
 	}
@@ -214,8 +213,6 @@ public class NoteServiceImpl implements NoteService {
 		}
 	}
 
-	
-
 	@Override
 	public List<Note> getArchiveNote(String token) {
 		String id = tockenGenerator.verifyTocken(token);
@@ -235,14 +232,12 @@ public class NoteServiceImpl implements NoteService {
 		Optional<User> optionUser = userRepository.findById(id);
 		return optionUser.filter(user -> {
 			return user != null;
+
 		}).map(user -> {
 			List<Note> listNotes = noteRepository.findByUserIdAndTrash(id, true);
 			return listNotes;
 		}).orElseThrow(() -> new NoteException("note id note found"));
 	}
-
-
-
 
 	@Override
 	public Response addLavelToNote(String tocken, String noteId, String lavelId) {
@@ -252,7 +247,7 @@ public class NoteServiceImpl implements NoteService {
 		if (isUserId.isPresent()) {
 			Optional<Note> note = noteRepository.findByNoteId(noteId);
 			if (note.isPresent()) {
-				Optional<Label> level = levelRepository.findByLavelId(lavelId);
+				Optional<Label> level = labelRepository.findByLabelId(lavelId);
 				if (level.isPresent()) {
 					Note noteSaved = note.get();
 					Label lavelSaved = level.get();
@@ -262,7 +257,7 @@ public class NoteServiceImpl implements NoteService {
 					noteSaved.setUpdatedDate(LocalDateTime.now());
 					return new Response(200, "lavel added successfully", null);
 				} else {
-					throw new LevelException("lavel Id not Present");
+					throw new LabelException("lavel Id not Present");
 				}
 			} else {
 				throw new NoteException("note id not Present");
@@ -281,7 +276,7 @@ public class NoteServiceImpl implements NoteService {
 			Optional<Note> isNoteId = noteRepository.findByNoteId(noteId);
 			if (isNoteId.isPresent()) {
 
-				Optional<Label> isLevelId = levelRepository.findByLavelId(lavelId);
+				Optional<Label> isLevelId = labelRepository.findByLabelId(lavelId);
 				if (isLevelId.isPresent()) {
 
 					Note note = isNoteId.get();
@@ -307,18 +302,6 @@ public class NoteServiceImpl implements NoteService {
 		}
 		return null;
 
-	}
-
-	@Override
-	public Response setReminder(String tocken, String noteId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Response removeReminder(String tocken, String noteId) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

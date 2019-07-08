@@ -15,13 +15,13 @@ public class User {
 	@Id
 	private String userId;
 
-//	@Indexed(unique = true)
+	@Indexed(unique = true)
 	private String emailId;
 	private String name;
 	private String password;
 	private String mobileNo;
 	private boolean isVerify;
-	
+	private String image;
 	@DBRef
 	List<Note> userNote ;
 	
@@ -36,7 +36,14 @@ public class User {
 		this.isVerify = isVerify;
 	}
 	
-	
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
 	public List<Note> getUserNote() {
 		return userNote;
 	}

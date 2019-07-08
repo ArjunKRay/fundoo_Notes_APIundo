@@ -15,8 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bridgelabz.level.dto.LavelDto;
-import com.bridgelabz.level.service.IlavelService;
+import com.bridgelabz.level.dto.LabelDto;
+import com.bridgelabz.level.model.Label;
+import com.bridgelabz.level.service.IlabelService;
 import com.bridgelabz.response.Response;
 
 @RestController
@@ -24,32 +25,32 @@ import com.bridgelabz.response.Response;
 public class LavelController {
 
 	@Autowired(required = true)
-	IlavelService lavelService;
+	IlabelService lavelService;
 
 	@PostMapping("/create")
-	public ResponseEntity<Response> create(@RequestBody LavelDto levelDto, @RequestHeader String tocken) {
-		Response response = lavelService.createLavel(levelDto, tocken);
+	public ResponseEntity<Response> create(@RequestBody LabelDto levelDto, @RequestHeader String tocken) {
+		Response response = lavelService.createLabel(levelDto, tocken);
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/delete")
 	public ResponseEntity<Response> delete(@RequestHeader String tocken, @RequestParam String lavelId) {
-		Response response = lavelService.deleteLavel(tocken, lavelId);
+		Response response = lavelService.deleteLabel(tocken, lavelId);
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 
 	}
 
 	@PutMapping("/update")
-	public ResponseEntity<Response> update(@RequestBody LavelDto lavelDto, @RequestHeader String tocken,
+	public ResponseEntity<Response> update(@RequestBody LabelDto lavelDto, @RequestHeader String tocken,
 			@RequestParam String lavelId) {
-		Response response = lavelService.updateLavel(lavelDto, tocken, lavelId);
+		Response response = lavelService.updateLabel(lavelDto, tocken, lavelId);
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 
 	@GetMapping("/getAll")
-	public List<LavelDto> listLavel(@RequestHeader String tocken) {
-		List<LavelDto> listlavel = lavelService.getAllLavel(tocken);
-		return listlavel;
+	public List<Label> listLavel(@RequestHeader String tocken) {
+		return lavelService.getAllLabel(tocken);
+
 	}
 
 }

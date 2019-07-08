@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 			User saveUser = userRepository.save(user);
 			try {
 				String tocken = tockenGenerator.generateTocken(saveUser.getUserId());
-				String activationUrl = requestUrl.substring(0, requestUrl.lastIndexOf("/")) + "/verification/" + tocken;
+				String activationUrl = requestUrl.substring(0, requestUrl.lastIndexOf("/")) + "/resetPassword/" + tocken;
 				Email email = new Email();
 				email.setTo("kumar.arjun6515@gmail.com");
 				email.setSubject("Account Verification");
@@ -94,12 +94,11 @@ public class UserServiceImpl implements UserService {
 			User userSaved = userOptional.get();
 		 try {
 				String tocken = tockenGenerator.generateTocken(userSaved.getUserId());
-				String activationUrl = requestUrl.substring(0, requestUrl.lastIndexOf("/")) + "/verification/" + tocken;
+				String activationUrl = requestUrl.substring(0, requestUrl.lastIndexOf("/")) + "/resetPassword/" + tocken;
 				Email email = new Email();
 				email.setTo("kumar.arjun6515@gmail.com");
 				email.setSubject("Account Verification");
-				email.setBody("Please verify EmailId using belowl ink \n" + activationUrl);
-				System.out.println("UserServiceImpl.registration() url " + activationUrl);
+				email.setBody("Change Password . \n" + activationUrl);
 				mailsender.send(email);
 				return new Response(200, "Email send successfuly", null);
 			   } 

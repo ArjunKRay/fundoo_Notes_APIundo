@@ -23,11 +23,13 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.bridgelabz.notes.model.Note;
 import com.bridgelabz.utility.ITockenGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@Service
 public class ElasticSearchImpl implements ElasticSearchService {
 
 	
@@ -110,7 +112,7 @@ public class ElasticSearchImpl implements ElasticSearchService {
 	}
 
 	@Override
-	public List<Note> elasticSearch(String getString, String tocken) {
+	public List<Note> elasticSearchByTitle(String getString, String tocken) {
 	    String userId = tockenGenerator.verifyTocken(tocken);
 		QueryBuilder queryBuilder= QueryBuilders.boolQuery()
 				                       .must(QueryBuilders.queryStringQuery("*"+getString+"*")
@@ -142,8 +144,7 @@ public class ElasticSearchImpl implements ElasticSearchService {
 
 			Arrays.stream(searchHit)
 					.forEach(hit -> profileDocuments.add(objectMapper.convertValue(hit.getSourceAsMap(), Note.class)));
-		}
-
+		  }
 		return profileDocuments;
 	
 	}

@@ -10,6 +10,6 @@ public interface ElasticSearchService {
 	String deleteNote(String noteId);
 	String updateNote(Note note);
 	Note findByNoteId(String noteId);
-	List<Note>elasticSearch(String title,String userId);
+	List<Note>elasticSearchByTitle(String title,String userId);
 
 }

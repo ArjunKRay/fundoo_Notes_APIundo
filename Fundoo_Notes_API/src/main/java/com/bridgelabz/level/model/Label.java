@@ -9,31 +9,27 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.bridgelabz.notes.model.Note;
 
-@Document(collection = "Lavel")
+@Document(collection = "Label")
 public class Label {
 
 	@Id
-	private String lavelId;
-	private String lavelName;
+	private String labelId;
+	private String labelName;
 	private LocalDateTime createdDate;
 	private LocalDateTime updatedDate;
 	private Note note;
 	private String userId;
-
-	@DBRef
-	private List<Note> notes;
-
+	
 	public Label() {
 	}
 
-	public Label(String lavelName, String userId, LocalDateTime createdDate, LocalDateTime updatedDate, Note note,
+	public Label(String labelName, String userId, LocalDateTime createdDate, LocalDateTime updatedDate, Note note,
 			List<Note> notes) {
-		this.lavelName = lavelName;
+		this.labelName = labelName;
 
 		this.createdDate = createdDate;
 		this.updatedDate = updatedDate;
 		this.note = note;
-		this.notes = notes;
 		this.userId = userId;
 	}
 
@@ -45,20 +41,20 @@ public class Label {
 		this.userId = userId;
 	}
 
-	public String getLavelName() {
-		return lavelName;
+	public String getLabelName() {
+		return labelName;
 	}
 
-	public void setLavelName(String lavelName) {
-		this.lavelName = lavelName;
+	public void setLabelName(String labelName) {
+		this.labelName = labelName;
 	}
 
-	public String getLevelId() {
-		return lavelId;
+	public String getLabelId() {
+		return labelId;
 	}
 
-	public void setLevelId(String lavelId) {
-		this.lavelId = lavelId;
+	public void setLabelId(String labelId) {
+		this.labelId = labelId;
 	}
 
 	public LocalDateTime getCreatedDate() {
@@ -77,13 +73,6 @@ public class Label {
 		this.updatedDate = updatedDate;
 	}
 
-	public List<Note> getNotes() {
-		return notes;
-	}
-
-	public void setNotes(List<Note> notes) {
-		this.notes = notes;
-	}
 
 	public Note getNote() {
 		return note;
